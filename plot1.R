@@ -1,16 +1,14 @@
 setwd("~/Documents/DataScience/4_ExploratoryDataAnalysis")
 
-dat <- read.table('household_power_consumption.txt',header=T,sep=";", stringsAsFactors = F,na.strings = "?")
-dat[,1] <- as.Date(dat[,1],'%d/%m/%Y') 
-dat2 <- dat[dat[,1]>="2007-02-01",]
-dat2 <- dat2[dat2[,1]<="2007-02-02",] 
-# dat2[,2] <- format(strptime(dat2[,2],format = "%H:%M:%S", tz=""),"%T")
-dat_test <- strptime(dat2[,2],format = "%H:%M:%S", tz="")
-dat_test <- as.data.frame(dat_test)
-dat2[,2] <- dat_test
+# The first two rows of code will read in a text file called 'household_power_consumption' to the dataset 'dat'
+dat <- read.table('household_power_consumption.txt',header=T,sep=";", na.strings = "?", skip = 66636, nrows = 2880, 
+                  colClasses = c("character", "character", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric"))
+colnames(dat) = c("Cdate", "Ctime", "Global_active_power", "Global_reactive_power", "Voltage", "Global_intensity", "Sub_metering_1", "Sub_metering_2", "Sub_metering_3")
 
-dat3 <- dat2[order(dat2[,2]),]
-dat3 <- dat3[1:1440,]
-hist(dat3[,3], col="red", main="Global Active Power", xlab = "Global Active Power (kilowatts)", ylim = c(0,1200))
+# Creates a new varibale 'DateTime' by converting and combining the date and time variables
+dat$DateTime <- strptime(paste(dat$Cdate,dat$Ctime), format = "%d/%m/%Y %H:%M:%S")
+
+# Plots a histogram of Global_active_power and prints to a .png
+hist(dat$Global_active_power, col="red", main="Global Active Power", xlab = "Global Active Power (kilowatts)", ylim = c(0,1200), ylab = "Frequency")
 dev.copy(png, file="plot1.png")
 dev.off()
